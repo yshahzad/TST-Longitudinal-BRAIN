@@ -1,0 +1,318 @@
+---
+title: "Plots for Brain Canada Longitudinal Project"
+output: html_notebook
+---
+
+
+
+```{r}
+library(ggplot2)
+library(tidyr)
+
+FMA.df <- data.frame(T1 = BrainCanada$FMA_T1,
+                     T2 = BrainCanada$FMA_T2,
+                     T3 = BrainCanada$FMA_T3)
+FMA_LI.df <- data.frame(T1 = BrainCanada$FMA_T1[BrainCanada$MEP_Group == 1],
+                        T3 = BrainCanada$FMA_T3[BrainCanada$MEP_Group == 1])
+
+FMA_MI.df <- data.frame(T1 = BrainCanada$FMA_T1[BrainCanada$MEP_Group == 2],
+                        T3 = BrainCanada$FMA_T3[BrainCanada$MEP_Group == 2])
+
+FMA_LI.df <- data.frame(T1 = BrainCanada$FMA_T1[BrainCanada$MEP_Group == 3],
+                        T3 = BrainCanada$FMA_T3[BrainCanada$MEP_Group == 3])
+
+
+# Reshape the data
+FMA.df <- gather(FMA.df, key = "Time", value = "Value", T1:T3)
+
+
+
+# Create side-by-side boxplots
+ggplot(FMA.df, aes(x = Time, y = Value)) +
+  geom_boxplot(width = 0.6, position = position_dodge(width = 0.75)) +
+  labs(x = "Session", 
+       y = "FMA Score (0-66)", 
+       title = 'FMA Scores over Time',
+       caption = 'Figure 2: FMA Scores at each assessment (n = 25)'
+       ) +
+  scale_fill_manual(values = c("#0099f8", "#e74c3c", "#2ecc71")) +
+  theme_classic() +
+  theme(
+    text = element_text(family = "Times New Roman"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(face = "italic")
+    )
+
+
+```
+
+```{r}
+#FMA plot
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+int_group <- factor(BrainCanada$MEP_Group, levels = c(1, 2, 3), 
+             labels = c('LI', 'MI', 'HI'))
+
+FMA.df <- data.frame(T1 = BrainCanada$FMA_T1,
+                     T2 = BrainCanada$FMA_T2,
+                     T3 = BrainCanada$FMA_T3,
+                     MEP_Group = int_group) # renames x axis
+
+FMA_long.df <- melt(FMA.df, id = "MEP_Group", variable.name = "Session") # melts wide form to long form
+print(FMA_long.df)
+
+
+
+FMA_plot <- ggplot(FMA_long.df, aes(x = MEP_Group, y = value, color = Session)) + # ggplot function
+  geom_boxplot(width = 0.6, position = position_dodge(width = 0.75)) +
+  labs(x = "Intervention Group", 
+       y = "FMA Score", 
+       title = 'FMA'
+       ) +
+  scale_fill_manual(values = c("#0099f8", "#e74c3c", "#2ecc71")) +
+  theme_classic() +
+  scale_color_brewer(palette = "Accent") +
+  theme(
+    text = element_text(family = "Times New Roman"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(face = "italic")
+    )
+
+FMA_plot
+ggsave('FMA_plt.jpg', height = 16, units = c('cm'), dpi = 300)
+
+```
+
+```{r}
+#BBT plot
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+int_group <- factor(BrainCanada$MEP_Group, levels = c(1, 2, 3), 
+             labels = c('LI', 'MI', 'HI'))
+
+BBT.df <- data.frame(T1 = BrainCanada$BBT_T1_A,
+                     T2 = BrainCanada$BBT_T2_A,
+                     T3 = BrainCanada$BBT_T3_A,
+                     MEP_Group = int_group) # renames x axis
+
+BBT_long.df <- melt(BBT.df, id = "MEP_Group", variable.name = "Session") # melts wide form to long form
+
+BBT_plot <- ggplot(BBT_long.df, aes(x = MEP_Group, y = value, color = Session)) + # ggplot function
+  geom_boxplot(width = 0.6, position = position_dodge(width = 0.75)) +
+  labs(x = "Intervention Group", 
+       y = "Blocks moved", 
+       title = 'BBT'
+       ) +
+  scale_fill_manual(values = c("#0099f8", "#e74c3c", "#2ecc71")) +
+  theme_classic() +
+  scale_color_brewer(palette = "Accent") +
+  theme(
+    text = element_text(family = "Times New Roman"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(face = "italic"))
+
+BBT_plot
+ggsave('BBT_plt.jpg', height = 16, units = c('cm'), dpi = 300)
+
+```
+
+```{r}
+#GS plot
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+int_group <- factor(BrainCanada$MEP_Group, levels = c(1, 2, 3), 
+             labels = c('LI', 'MI', 'HI'))
+
+GS.df <- data.frame(T1 = BrainCanada$GS_T1_A,
+                     T2 = BrainCanada$GS_T2_A,
+                     T3 = BrainCanada$GS_T3_A,
+                     MEP_Group = int_group) # renames x axis
+
+GS_long.df <- melt(GS.df, id = "MEP_Group", variable.name = "Session") # melts wide form to long form
+
+GS_plot <- ggplot(GS_long.df, aes(x = MEP_Group, y = value, color = Session)) + # ggplot function
+  geom_boxplot(width = 0.6, position = position_dodge(width = 0.75)) +
+  labs(x = "Intervention Group", 
+       y = "Grip Strength (kg)", 
+       title = 'Grip Strength'
+       ) +
+  scale_fill_manual(values = c("#0099f8", "#e74c3c", "#2ecc71")) +
+  theme_classic() +
+  scale_color_brewer(palette = "Accent") +
+  theme(
+    text = element_text(family = "Times New Roman"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(face = "italic"))
+
+GS_plot
+ggsave('GS_plt.jpg', height = 16, units = c('cm'), dpi = 300)
+
+```
+
+```{r}
+#GS plot
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+int_group <- factor(BrainCanada$MEP_Group, levels = c(1, 2, 3), 
+             labels = c('LI', 'MI', 'HI'))
+
+MAL_Quant.df <- data.frame(T1 = BrainCanada$MAL_Quant_T1,
+                     T2 = BrainCanada$MAL_Quant_T2,
+                     T3 = BrainCanada$MAL_Quant_T3,
+                     MEP_Group = int_group) # renames x axis
+
+MAL_Quant_long.df <- melt(MAL_Quant.df, id = "MEP_Group", variable.name = "Session") # melts wide form to long form
+
+MAL_Quant_plot <- ggplot(MAL_Quant_long.df, aes(x = MEP_Group, y = value, color = Session)) + # ggplot function
+  geom_boxplot(width = 0.6, position = position_dodge(width = 0.75)) +
+  labs(x = "Intervention Group", 
+       y = "Score", 
+       title = 'MAL AOU'
+       ) +
+  scale_fill_manual(values = c("#0099f8", "#e74c3c", "#2ecc71")) +
+  theme_classic() +
+  scale_color_brewer(palette = "Accent") +
+  theme(
+    text = element_text(family = "Times New Roman"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(face = "italic"))
+
+MAL_Quant_plot
+ggsave('MAL_Quant_plot.jpg', height = 16, units = c('cm'), dpi = 300)
+
+```
+
+```{r}
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+int_group <- factor(BrainCanada$MEP_Group, levels = c(1, 2, 3), 
+             labels = c('LI', 'MI', 'HI'))
+
+MAL_Quali.df <- data.frame(T1 = BrainCanada$MAL_Quali_T1,
+                     T2 = BrainCanada$MAL_Quali_T2,
+                     T3 = BrainCanada$MAL_Quali_T3,
+                     MEP_Group = int_group) # renames x axis
+
+MAL_Quali_long.df <- melt(MAL_Quali.df, id = "MEP_Group", variable.name = "Session") # melts wide form to long form
+
+MAL_Quali_plot <- ggplot(MAL_Quali_long.df, aes(x = MEP_Group, y = value, color = Session)) + # ggplot function
+  geom_boxplot(width = 0.6, position = position_dodge(width = 0.75)) +
+  labs(x = "Intervention Group", 
+       y = "Score", 
+       title = 'MAL QOU'
+       ) +
+  scale_fill_manual(values = c("#0099f8", "#e74c3c", "#2ecc71")) +
+  theme_classic() +
+  scale_color_brewer(palette = "Accent") +
+  theme(
+    text = element_text(family = "Times New Roman"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(face = "italic"))
+
+MAL_Quali_plot
+ggsave('MAL_Quali_plot.jpg', height = 16, units = c('cm'), dpi = 300)
+```
+```{r}
+#Shoulder AROM
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+int_group <- factor(BrainCanada$MEP_Group, levels = c(1, 2, 3), 
+             labels = c('LI', 'MI', 'HI'))
+
+shoulder.df <- data.frame(T1 = BrainCanada$ROM_Shoulder_Affected_Active_T1,
+                     T2 = BrainCanada$ROM_Shoulder_Affected_Active_T2,
+                     T3 = BrainCanada$ROM_Shoulder_Affected_Active_T3,
+                     MEP_Group = int_group) # renames x axis
+
+shoulder_long.df <- melt(shoulder.df, id = "MEP_Group", variable.name = "Session") # melts wide form to long form
+
+shoulder_plot <- ggplot(shoulder_long.df, aes(x = MEP_Group, y = value, color = Session)) + # ggplot function
+  geom_boxplot(width = 0.6, position = position_dodge(width = 0.75)) +
+  labs(x = "Intervention Group", 
+       y = "AROM°", 
+       title = 'Shoulder'
+       ) +
+  scale_fill_manual(values = c("#0099f8", "#e74c3c", "#2ecc71")) +
+  theme_classic() +
+  scale_color_brewer(palette = "Accent") +
+  theme(
+    text = element_text(family = "Times New Roman"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(face = "italic"))
+
+shoulder_plot
+#ggsave('shoulder_plot.jpg', height = 16, units = c('cm'), dpi = 300)
+
+```
+```{r}
+#Elbow AROM
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+int_group <- factor(BrainCanada$MEP_Group, levels = c(1, 2, 3), 
+             labels = c('LI', 'MI', 'HI'))
+
+elbow.df <- data.frame(T1 = BrainCanada$ROM_Elbow_Affected_Active_T1,
+                     T2 = BrainCanada$ROM_Elbow_Affected_Active_T2,
+                     T3 = BrainCanada$ROM_Elbow_Affected_Active_T3,
+                     MEP_Group = int_group) # renames x axis
+
+elbow_long.df <- melt(elbow.df, id = "MEP_Group", variable.name = "Session") # melts wide form to long form
+
+elbow_plot <- ggplot(elbow_long.df, aes(x = MEP_Group, y = value, color = Session)) + # ggplot function
+  geom_boxplot(width = 0.6, position = position_dodge(width = 0.75)) +
+  labs(x = "Intervention Group", 
+       y = "AROM°", 
+       title = 'Elbow'
+       ) +
+  scale_fill_manual(values = c("#0099f8", "#e74c3c", "#2ecc71")) +
+  theme_classic() +
+  scale_color_brewer(palette = "Accent") +
+  theme(
+    text = element_text(family = "Times New Roman"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(face = "italic"))
+
+elbow_plot
+#ggsave('elbow_plot.jpg', height = 16, units = c('cm'), dpi = 300)
+```
+```{r}
+#Wrist AROM
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+int_group <- factor(BrainCanada$MEP_Group, levels = c(1, 2, 3), 
+             labels = c('LI', 'MI', 'HI'))
+
+wrist.df <- data.frame(T1 = BrainCanada$ROM_Wrist_Affected_Active_T1,
+                     T2 = BrainCanada$ROM_Wrist_Affected_Active_T2,
+                     T3 = BrainCanada$ROM_Wrist_Affected_Active_T3,
+                     MEP_Group = int_group) # renames x axis
+
+wrist_long.df <- melt(wrist.df, id = "MEP_Group", variable.name = "Session") # melts wide form to long form
+
+wrist_plot <- ggplot(wrist_long.df, aes(x = MEP_Group, y = value, color = Session)) + # ggplot function
+  geom_boxplot(width = 0.6, position = position_dodge(width = 0.75)) +
+  labs(x = "Intervention Group", 
+       y = "AROM°", 
+       title = 'Wrist'
+       ) +
+  scale_fill_manual(values = c("#0099f8", "#e74c3c", "#2ecc71")) +
+  theme_classic() +
+  scale_color_brewer(palette = "Accent") +
+  theme(
+    text = element_text(family = "Times New Roman"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption = element_text(face = "italic"))
+
+wrist_plot
+#ggsave('wrist_plot.jpg', height = 16, units = c('cm'), dpi = 300)
+```
+
+
