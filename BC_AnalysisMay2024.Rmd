@@ -1,0 +1,191 @@
+---
+title: "Brain Canada Project Analysis"
+author: "Yavuz Shahzad"
+date: "5/1/2024"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+
+BC_Rot <- read.csv("~/Desktop/Brain Canada Project/Data Analysis/BrainCanadaFinalRotated.csv")
+BC_Or <- read.csv("~/Desktop/Brain Canada Project/Data Analysis/BrainCanada.csv")
+
+holm_bonferroni <- function(T3, T2, T1){
+  
+  suppressWarnings({
+  first <- wilcox.test(T3, T2, paired = TRUE)
+  second <- wilcox.test(T3, T1, paired = TRUE)
+  third <- wilcox.test(T2, T1, paired = TRUE)
+  })
+  
+  p_vals <- c(first$p.value, second$p.value, third$p.value)
+  names(p_vals) <- c("T3 vs T2", "T3 vs T1", "T2 vs T1")
+  sorted_p_vals <- sort(p_vals)
+  
+  exit <- FALSE
+  result <- c()
+  
+  for (k in 1:3){
+    if (!(exit)) {
+      if (sorted_p_vals[k] < (0.05/(3 + 1 - k))){
+        result <- append(result, "Reject")
+      }
+      
+      else{
+        result <- append(result, "Fail to reject")
+        exit <- TRUE
+      }
+    }
+    
+    else{
+      result <- append(result, "Fail to reject")
+    }
+  }
+  cat("\n")
+  print("Results of pairwise, paired Wilcoxon with Holm-Bonferroni correction for multiple comparisons")
+  cat("\n")
+  print(sorted_p_vals)
+  cat("\n")
+  print(result)
+  
+}
+
+interaction_plot <- function(){
+  interaction.plot(x.factor = data$exercise, #x-axis variable
+                 trace.factor = data$gender, #variable for lines
+                 response = data$weight_loss, #y-axis variable
+                 fun = median, #metric to plot
+                 ylab = "Weight Loss",
+                 xlab = "Exercise Intensity",
+                 col = c("pink", "blue"),
+                 lty = 1, #line type
+                 lwd = 2, #line width
+                 trace.label = "Gender")
+}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The newest results look good for the most part. Only FMA and Shoulder AROM are behaving in a slightly pathological way, relative to our previous results; BBT results remain inconclusive, as before, but the remaining results are ideal. The main changes made were that we tested all variables in a MANOVA (as per Dr. Tremblay's request), followed by post-hoc pairwise Wilcoxon tests to tell the difference between variables at each follow up, if necessary. We used a Holm-Bonferroni correction to control the family-wise error rate in the multiple comparisons. Here are the results:
+
+$\\$
+\textbf{FMA}
+
+```{r}
+FMA_MANOVA <- aov(FMA ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up + 
+                   Participant , data = BC_Rot)
+summary(FMA_MANOVA)
+holm_bonferroni(BC_Or$FMA_T3, BC_Or$FMA_T2, BC_Or$FMA_T1)
+
+interaction.plot(x.factor = BC_Rot$Follow_Up, #x-axis variable
+                 trace.factor = BC_Rot$MEP_Group, #variable for lines
+                 response = BC_Rot$FMA, #y-axis variable
+                 fun = median, #metric to plot
+                 ylab = "FMA",
+                 xlab = "Follow Up",
+                 col = c("pink", "blue"),
+                 trace.label = "MEP Group")
+```
+$\\$
+$\\$
+We see, from the pairwise comparison that T3 and T2 FMA scores are significantly higher than T1 scores, but there appears to be an interaction between Follow-Up and MEP-Group in predicting FMA. The interaction plot shows that those in the LI MEP group (group 1) showed more improvement between T1 and T2 than did those in the HI group. In the paper I plan on justifying this as a consequence of the natural ceiling effect that comes with the FMA, since it is only out of 66, and those in the HI group were already strong to begin with.
+
+$\\$
+\textbf{BBT}
+
+```{r}
+BBT_MANOVA <- aov(BBT ~ MEP_Group + Follow_Up
+                  + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+
+summary(BBT_MANOVA)
+```
+$\\$
+As before, we find no significant differences between any of the follow ups in BBT. 
+
+$\\$
+\textbf{Grip Strength}
+
+```{r}
+GS_MANOVA <- aov(Grip_Strength ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
+                 + Participant, data = BC_Rot)
+summary(GS_MANOVA)
+holm_bonferroni(BC_Or$GS_T3_A, BC_Or$GS_T2_A, BC_Or$GS_T1_A)
+```
+$\\$
+We find that both MEP groups maintained their gains in grip strength to the same degree. These results are consistent with the previous reults. 
+
+$\\$
+\textbf{MAL AOU}
+
+```{r}
+MAL_AOU_MANOVA <- aov(MAL_AOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
+                      + Participant, data = BC_Rot)
+summary(MAL_AOU_MANOVA)
+holm_bonferroni(BC_Or$MAL_Quant_T3, BC_Or$MAL_Quant_T2, BC_Or$MAL_Quant_T1)
+```
+$\\$
+We find that both MEP groups maintained their gains in MAL AOU score to the same degree, since there is no interaction between follow up and MEP group.
+
+$\\$
+\textbf{MAL QOU}
+```{r}
+MAL_QOU_MANOVA <- aov(MAL_QOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
+                      + Participant, data = BC_Rot)
+summary(MAL_QOU_MANOVA)
+
+holm_bonferroni(BC_Or$MAL_Quali_T3, BC_Or$MAL_Quali_T2, BC_Or$MAL_Quali_T1)
+```
+$\\$
+We find that both MEP groups maintained their gains in MAL QOU score to the same degree.
+
+$\\$
+\textbf{Shoulder Active ROM}
+
+```{r}
+Shoulder_MANOVA <- aov(BC_Rot$Shoulder_AROM ~ MEP_Group + Follow_Up 
+                       + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+summary(Shoulder_MANOVA)
+
+holm_bonferroni(BC_Or$ROM_Shoulder_Affected_Active_T3,
+                BC_Or$ROM_Shoulder_Affected_Active_T2, 
+                BC_Or$ROM_Shoulder_Affected_Active_T1)
+
+interaction.plot(x.factor = BC_Rot$Follow_Up, #x-axis variable
+                 trace.factor = BC_Rot$MEP_Group, #variable for lines
+                 response = BC_Rot$Shoulder_AROM, #y-axis variable
+                 fun = median, #metric to plot
+                 ylab = "Shoulder Active ROM",
+                 xlab = "Follow Up",
+                 col = c("pink", "blue"),
+                 trace.label = "MEP Group")
+```
+$\\$
+$\\$
+Here we have that all participants maintained gains in shoulder AROM, but did so slightly differently between MEP groups since there is a significant interaction term. Although the interaction is significant, the effect size is small since examining the interaction plot shows us that both groups demonstrated similar patterns of strength gain, albeit from different baselines.  
+
+$\\$
+\textbf{Elbow Active ROM}
+```{r}
+Elbow_MANOVA <- aov(BC_Rot$Elbow_AROM ~ MEP_Group + Follow_Up
+                    + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+summary(Elbow_MANOVA)
+```
+$\\$
+No improvements were found in elbow AROM, as before.
+
+$\\$
+\textbf{Wrist Active ROM}
+```{r}
+Wrist_MANOVA <- aov(BC_Rot$Wrist_AROM ~ MEP_Group + Follow_Up 
+                    + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+summary(Wrist_MANOVA)
+```
+$\\$
+No improvements were found in wrist AROM, as before.
+
+$\\$
+These are all of the results. 
