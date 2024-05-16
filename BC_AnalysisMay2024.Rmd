@@ -1,7 +1,7 @@
 ---
 title: "Brain Canada Project Analysis"
 author: "Yavuz Shahzad"
-date: "5/1/2024"
+date: "5/16/2024"
 output:
   pdf_document: default
   html_document: default
@@ -105,6 +105,7 @@ FMA_MANOVA <- aov(FMA ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up +
 summary(FMA_MANOVA)
 holm_bonferroni(BC_Or$FMA_T3, BC_Or$FMA_T2, BC_Or$FMA_T1)
 
+
 interaction.plot(x.factor = BC_Rot$Follow_Up, #x-axis variable
                  trace.factor = BC_Rot$MEP_Group, #variable for lines
                  response = BC_Rot$FMA, #y-axis variable
@@ -175,6 +176,8 @@ MAL_QOU_MANOVA <- aov(MAL_QOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up
 summary(MAL_QOU_MANOVA)
 
 holm_bonferroni(BC_Or$MAL_Quali_T3, BC_Or$MAL_Quali_T2, BC_Or$MAL_Quali_T1)
+
+wilcox.test(BC_Or$MAL_Quali_T3, BC_Or$MAL_Quali_T2, BC_Or$MAL_Quali_T1, paird = TRUE)
 
 bootstrap_CI(BC_Or$MAL_Quali_T1, BC_Or$MAL_Quali_T3)
 bootstrap_CI(BC_Or$MAL_Quali_T1, BC_Or$MAL_Quali_T2)
