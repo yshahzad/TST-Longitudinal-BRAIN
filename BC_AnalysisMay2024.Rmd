@@ -55,6 +55,30 @@ holm_bonferroni <- function(T3, T2, T1){
   
 }
 
+bootstrap_CI <- function(TIME1, TIME2) {
+  
+  B <- 10000 #Ten thousand re-samples
+  difference <- TIME2 - TIME1
+  bootMean <- vector()
+  
+  for (i in 1:B){
+    bootSample <- sample(difference, size = 25,
+                         replace = TRUE)
+    
+    #Assigns mean values of each resample to the vector bootMean
+    bootMean[i] <- mean(bootSample)
+    #cat("Bootstrap sample:", i ,"\n")
+  }
+  
+  mean(bootMean)
+  
+  #Lends a confidence interval, since this is an approximate sample distribution.
+  CI <- quantile(bootMean, probs = c(0.025, 0.975))
+  
+  return(CI)
+}
+
+
 interaction_plot <- function(){
   interaction.plot(x.factor = data$exercise, #x-axis variable
                  trace.factor = data$gender, #variable for lines
@@ -89,6 +113,10 @@ interaction.plot(x.factor = BC_Rot$Follow_Up, #x-axis variable
                  xlab = "Follow Up",
                  col = c("pink", "blue"),
                  trace.label = "MEP Group")
+
+bootstrap_CI(BC_Or$FMA_T1, BC_Or$FMA_T3)
+bootstrap_CI(BC_Or$FMA_T2, BC_Or$FMA_T3)
+bootstrap_CI(BC_Or$FMA_T1, BC_Or$FMA_T2)
 ```
 $\\$
 $\\$
@@ -114,9 +142,13 @@ GS_MANOVA <- aov(Grip_Strength ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up
                  + Participant, data = BC_Rot)
 summary(GS_MANOVA)
 holm_bonferroni(BC_Or$GS_T3_A, BC_Or$GS_T2_A, BC_Or$GS_T1_A)
+
+bootstrap_CI(BC_Or$GS_T1_A, BC_Or$GS_T3_A)
+bootstrap_CI(BC_Or$GS_T1_A, BC_Or$GS_T2_A)
+bootstrap_CI(BC_Or$GS_T2_A, BC_Or$GS_T3_A)
 ```
 $\\$
-We find that both MEP groups maintained their gains in grip strength to the same degree. These results are consistent with the previous reults. 
+We find that both MEP groups maintained their gains in grip strength to the same degree. These results are consistent with the previous results. 
 
 $\\$
 \textbf{MAL AOU}
@@ -126,6 +158,11 @@ MAL_AOU_MANOVA <- aov(MAL_AOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up
                       + Participant, data = BC_Rot)
 summary(MAL_AOU_MANOVA)
 holm_bonferroni(BC_Or$MAL_Quant_T3, BC_Or$MAL_Quant_T2, BC_Or$MAL_Quant_T1)
+
+bootstrap_CI(BC_Or$MAL_Quant_T2, BC_Or$MAL_Quant_T3)
+bootstrap_CI(BC_Or$MAL_Quant_T1, BC_Or$MAL_Quant_T3)
+bootstrap_CI(BC_Or$MAL_Quant_T1, BC_Or$MAL_Quant_T2)
+
 ```
 $\\$
 We find that both MEP groups maintained their gains in MAL AOU score to the same degree, since there is no interaction between follow up and MEP group.
@@ -138,6 +175,10 @@ MAL_QOU_MANOVA <- aov(MAL_QOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up
 summary(MAL_QOU_MANOVA)
 
 holm_bonferroni(BC_Or$MAL_Quali_T3, BC_Or$MAL_Quali_T2, BC_Or$MAL_Quali_T1)
+
+bootstrap_CI(BC_Or$MAL_Quali_T1, BC_Or$MAL_Quali_T3)
+bootstrap_CI(BC_Or$MAL_Quali_T1, BC_Or$MAL_Quali_T2)
+bootstrap_CI(BC_Or$MAL_Quali_T2, BC_Or$MAL_Quali_T3)
 ```
 $\\$
 We find that both MEP groups maintained their gains in MAL QOU score to the same degree.
@@ -162,6 +203,11 @@ interaction.plot(x.factor = BC_Rot$Follow_Up, #x-axis variable
                  xlab = "Follow Up",
                  col = c("pink", "blue"),
                  trace.label = "MEP Group")
+
+bootstrap_CI(BC_Or$ROM_Shoulder_Affected_Active_T2, BC_Or$ROM_Shoulder_Affected_Active_T3)
+bootstrap_CI(BC_Or$ROM_Shoulder_Affected_Active_T1, BC_Or$ROM_Shoulder_Affected_Active_T3)
+bootstrap_CI(BC_Or$ROM_Shoulder_Affected_Active_T1, BC_Or$ROM_Shoulder_Affected_Active_T2)
+
 ```
 $\\$
 $\\$
