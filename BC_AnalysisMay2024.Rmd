@@ -1,7 +1,7 @@
 ---
 title: "Brain Canada Project Analysis"
 author: "Yavuz Shahzad"
-date: "5/9/2024"
+date: "5/1/2024"
 output:
   pdf_document: default
   html_document: default
@@ -9,13 +9,11 @@ output:
 
 ```{r setup, include=FALSE}
 library(knitr)
-library(ez)
 
 opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
 
 BC_Rot <- read.csv("~/Desktop/Brain Canada Project/Data Analysis/BrainCanadaFinalRotated.csv")
 BC_Or <- read.csv("~/Desktop/Brain Canada Project/Data Analysis/BrainCanada.csv")
-BC_Rot$MEP_Group <- factor(BC_Rot$MEP_Group)
 
 holm_bonferroni <- function(T3, T2, T1){
   
@@ -78,20 +76,9 @@ $\\$
 \textbf{FMA}
 
 ```{r}
-#FMA_MANOVA <- aov(FMA ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up + 
-#                   Participant , data = BC_Rot)
-#summary(FMA_MANOVA)
-
-FMA_rmANOVA <- ezANOVA(
-  data = BC_Rot,
-  dv = FMA,
-  wid = as.factor(Participant),
-  within = c(Follow_Up),
-  between = c(MEP_Group),
-  detailed = TRUE,
-  return_aov = TRUE,
-  type = 3)
-print(FMA_rmANOVA)
+FMA_MANOVA <- aov(FMA ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up + 
+                   Participant , data = BC_Rot)
+summary(FMA_MANOVA)
 holm_bonferroni(BC_Or$FMA_T3, BC_Or$FMA_T2, BC_Or$FMA_T1)
 
 interaction.plot(x.factor = BC_Rot$Follow_Up, #x-axis variable
@@ -111,17 +98,10 @@ $\\$
 \textbf{BBT}
 
 ```{r}
-BBT_rmANOVA <- ezANOVA(
-  data = BC_Rot,
-  dv = BBT,
-  wid = as.factor(Participant),
-  within = c(Follow_Up),
-  between = c(MEP_Group),
-  detailed = TRUE,
-  #return_aov = TRUE,
-  type = 3)
-print(BBT_rmANOVA)
-holm_bonferroni(BC_Or$BBT_T3_A, BC_Or$BBT_T2_A, BC_Or$BBT_T1_A)
+BBT_MANOVA <- aov(BBT ~ MEP_Group + Follow_Up
+                  + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+
+summary(BBT_MANOVA)
 ```
 $\\$
 As before, we find no significant differences between any of the follow ups in BBT. 
@@ -130,20 +110,9 @@ $\\$
 \textbf{Grip Strength}
 
 ```{r}
-#GS_MANOVA <- aov(Grip_Strength ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
-#                 + Participant, data = BC_Rot)
-#summary(GS_MANOVA)
-
-GS_rmANOVA <- ezANOVA(
-  data = BC_Rot,
-  dv = Grip_Strength,
-  wid = as.factor(Participant),
-  within = c(Follow_Up),
-  between = c(MEP_Group),
-  detailed = TRUE,
-  #return_aov = TRUE,
-  type = 3)
-print(GS_rmANOVA)
+GS_MANOVA <- aov(Grip_Strength ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
+                 + Participant, data = BC_Rot)
+summary(GS_MANOVA)
 holm_bonferroni(BC_Or$GS_T3_A, BC_Or$GS_T2_A, BC_Or$GS_T1_A)
 ```
 $\\$
@@ -153,20 +122,9 @@ $\\$
 \textbf{MAL AOU}
 
 ```{r}
-#MAL_AOU_MANOVA <- aov(MAL_AOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
-#                      + Participant, data = BC_Rot)
-#summary(MAL_AOU_MANOVA)
-
-MAL_AOU_rmANOVA <- ezANOVA(
-  data = BC_Rot,
-  dv = MAL_AOU,
-  wid = as.factor(Participant),
-  within = c(Follow_Up),
-  between = c(MEP_Group),
-  detailed = TRUE,
-  #return_aov = TRUE,
-  type = 3)
-print(MAL_AOU_rmANOVA)
+MAL_AOU_MANOVA <- aov(MAL_AOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
+                      + Participant, data = BC_Rot)
+summary(MAL_AOU_MANOVA)
 holm_bonferroni(BC_Or$MAL_Quant_T3, BC_Or$MAL_Quant_T2, BC_Or$MAL_Quant_T1)
 ```
 $\\$
@@ -175,20 +133,9 @@ We find that both MEP groups maintained their gains in MAL AOU score to the same
 $\\$
 \textbf{MAL QOU}
 ```{r}
-#MAL_QOU_MANOVA <- aov(MAL_QOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
-#                      + Participant, data = BC_Rot)
-#summary(MAL_QOU_MANOVA)
-
-MAL_QOU_rmANOVA <- ezANOVA(
-  data = BC_Rot,
-  dv = MAL_QOU,
-  wid = as.factor(Participant),
-  within = c(Follow_Up),
-  between = c(MEP_Group),
-  detailed = TRUE,
-  #return_aov = TRUE,
-  type = 3)
-print(MAL_QOU_rmANOVA)
+MAL_QOU_MANOVA <- aov(MAL_QOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
+                      + Participant, data = BC_Rot)
+summary(MAL_QOU_MANOVA)
 
 holm_bonferroni(BC_Or$MAL_Quali_T3, BC_Or$MAL_Quali_T2, BC_Or$MAL_Quali_T1)
 ```
@@ -199,16 +146,9 @@ $\\$
 \textbf{Shoulder Active ROM}
 
 ```{r}
-Shoulder_rmANOVA <- ezANOVA(
-  data = BC_Rot,
-  dv = Shoulder_AROM,
-  wid = as.factor(Participant),
-  within = c(Follow_Up),
-  between = c(MEP_Group),
-  detailed = TRUE,
-  #return_aov = TRUE,
-  type = 3)
-print(Shoulder_rmANOVA)
+Shoulder_MANOVA <- aov(BC_Rot$Shoulder_AROM ~ MEP_Group + Follow_Up 
+                       + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+summary(Shoulder_MANOVA)
 
 holm_bonferroni(BC_Or$ROM_Shoulder_Affected_Active_T3,
                 BC_Or$ROM_Shoulder_Affected_Active_T2, 
@@ -230,34 +170,22 @@ Here we have that all participants maintained gains in shoulder AROM, but did so
 $\\$
 \textbf{Elbow Active ROM}
 ```{r}
-Elbow_rmANOVA <- ezANOVA(
-  data = BC_Rot,
-  dv = Elbow_AROM,
-  wid = as.factor(Participant),
-  within = c(Follow_Up),
-  between = c(MEP_Group),
-  detailed = TRUE,
-  #return_aov = TRUE,
-  type = 3)
-print(Elbow_rmANOVA)
+Elbow_MANOVA <- aov(BC_Rot$Elbow_AROM ~ MEP_Group + Follow_Up
+                    + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+summary(Elbow_MANOVA)
 ```
 $\\$
+No improvements were found in elbow AROM, as before.
 
 $\\$
 \textbf{Wrist Active ROM}
 ```{r}
-Wrist_rmANOVA <- ezANOVA(
-  data = BC_Rot,
-  dv = Wrist_AROM,
-  wid = as.factor(Participant),
-  within = c(Follow_Up),
-  between = c(MEP_Group),
-  detailed = TRUE,
-  #return_aov = TRUE,
-  type = 3)
-print(Wrist_rmANOVA)
+Wrist_MANOVA <- aov(BC_Rot$Wrist_AROM ~ MEP_Group + Follow_Up 
+                    + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+summary(Wrist_MANOVA)
 ```
 $\\$
+No improvements were found in wrist AROM, as before.
 
 $\\$
 These are all of the results. 
