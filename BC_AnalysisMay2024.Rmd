@@ -100,9 +100,12 @@ $\\$
 \textbf{FMA}
 
 ```{r}
+install.packages(rstatix)
+library(rstatix)
 FMA_MANOVA <- aov(FMA ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up + 
                    Participant , data = BC_Rot)
 summary(FMA_MANOVA)
+
 holm_bonferroni(BC_Or$FMA_T3, BC_Or$FMA_T2, BC_Or$FMA_T1)
 
 
