@@ -94,16 +94,13 @@ interaction_plot <- function(){
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-The newest results look good for the most part. Only FMA and Shoulder AROM are behaving in a slightly pathological way, relative to our previous results; BBT results remain inconclusive, as before, but the remaining results are ideal. The main changes made were that we tested all variables in a MANOVA (as per Dr. Tremblay's request), followed by post-hoc pairwise Wilcoxon tests to tell the difference between variables at each follow up, if necessary. We used a Holm-Bonferroni correction to control the family-wise error rate in the multiple comparisons. Here are the results:
-
 $\\$
 \textbf{FMA}
 
 ```{r}
-install.packages(rstatix)
-library(rstatix)
+
 FMA_MANOVA <- aov(FMA ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up + 
-                   Participant , data = BC_Rot)
+                   FMA_baseline , data = BC_Rot)
 summary(FMA_MANOVA)
 
 holm_bonferroni(BC_Or$FMA_T3, BC_Or$FMA_T2, BC_Or$FMA_T1)
@@ -123,27 +120,29 @@ bootstrap_CI(BC_Or$FMA_T2, BC_Or$FMA_T3)
 bootstrap_CI(BC_Or$FMA_T1, BC_Or$FMA_T2)
 ```
 $\\$
-$\\$
-We see, from the pairwise comparison that T3 and T2 FMA scores are significantly higher than T1 scores, but there appears to be an interaction between Follow-Up and MEP-Group in predicting FMA. The interaction plot shows that those in the LI MEP group (group 1) showed more improvement between T1 and T2 than did those in the HI group. In the paper I plan on justifying this as a consequence of the natural ceiling effect that comes with the FMA, since it is only out of 66, and those in the HI group were already strong to begin with.
 
 $\\$
 \textbf{BBT}
 
 ```{r}
 BBT_MANOVA <- aov(BBT ~ MEP_Group + Follow_Up
-                  + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+                  + MEP_Group*Follow_Up + BBT_Baseline, data = BC_Rot)
 
 summary(BBT_MANOVA)
+
+holm_bonferroni(BC_Or$BBT_T3_A, BC_Or$BBT_T2_A, BC_Or$BBT_T1_A)
+
+bootstrap_CI(BC_Or$BBT_T1_A, BC_Or$BBT_T3_A)
+bootstrap_CI(BC_Or$BBT_T2_A, BC_Or$BBT_T3_A)
+bootstrap_CI(BC_Or$BBT_T1_A, BC_Or$BBT_T2_A)
 ```
 $\\$
-As before, we find no significant differences between any of the follow ups in BBT. 
-
 $\\$
 \textbf{Grip Strength}
 
 ```{r}
 GS_MANOVA <- aov(Grip_Strength ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
-                 + Participant, data = BC_Rot)
+                 + GS_Baseline, data = BC_Rot)
 summary(GS_MANOVA)
 holm_bonferroni(BC_Or$GS_T3_A, BC_Or$GS_T2_A, BC_Or$GS_T1_A)
 
@@ -152,14 +151,12 @@ bootstrap_CI(BC_Or$GS_T1_A, BC_Or$GS_T2_A)
 bootstrap_CI(BC_Or$GS_T2_A, BC_Or$GS_T3_A)
 ```
 $\\$
-We find that both MEP groups maintained their gains in grip strength to the same degree. These results are consistent with the previous results. 
-
 $\\$
 \textbf{MAL AOU}
 
 ```{r}
 MAL_AOU_MANOVA <- aov(MAL_AOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
-                      + Participant, data = BC_Rot)
+                      + MAL_AOU_Baseline, data = BC_Rot)
 summary(MAL_AOU_MANOVA)
 holm_bonferroni(BC_Or$MAL_Quant_T3, BC_Or$MAL_Quant_T2, BC_Or$MAL_Quant_T1)
 
@@ -169,13 +166,12 @@ bootstrap_CI(BC_Or$MAL_Quant_T1, BC_Or$MAL_Quant_T2)
 
 ```
 $\\$
-We find that both MEP groups maintained their gains in MAL AOU score to the same degree, since there is no interaction between follow up and MEP group.
 
 $\\$
 \textbf{MAL QOU}
 ```{r}
 MAL_QOU_MANOVA <- aov(MAL_QOU ~ MEP_Group + Follow_Up + MEP_Group*Follow_Up 
-                      + Participant, data = BC_Rot)
+                      + MAL_QOU_Baseline, data = BC_Rot)
 summary(MAL_QOU_MANOVA)
 
 holm_bonferroni(BC_Or$MAL_Quali_T3, BC_Or$MAL_Quali_T2, BC_Or$MAL_Quali_T1)
@@ -187,14 +183,12 @@ bootstrap_CI(BC_Or$MAL_Quali_T1, BC_Or$MAL_Quali_T2)
 bootstrap_CI(BC_Or$MAL_Quali_T2, BC_Or$MAL_Quali_T3)
 ```
 $\\$
-We find that both MEP groups maintained their gains in MAL QOU score to the same degree.
-
 $\\$
 \textbf{Shoulder Active ROM}
 
 ```{r}
 Shoulder_MANOVA <- aov(BC_Rot$Shoulder_AROM ~ MEP_Group + Follow_Up 
-                       + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+                       + MEP_Group*Follow_Up + Shoulder_AROM_Baseline, data = BC_Rot)
 summary(Shoulder_MANOVA)
 
 holm_bonferroni(BC_Or$ROM_Shoulder_Affected_Active_T3,
@@ -217,27 +211,35 @@ bootstrap_CI(BC_Or$ROM_Shoulder_Affected_Active_T1, BC_Or$ROM_Shoulder_Affected_
 ```
 $\\$
 $\\$
-Here we have that all participants maintained gains in shoulder AROM, but did so slightly differently between MEP groups since there is a significant interaction term. Although the interaction is significant, the effect size is small since examining the interaction plot shows us that both groups demonstrated similar patterns of strength gain, albeit from different baselines.  
-
-$\\$
 \textbf{Elbow Active ROM}
 ```{r}
 Elbow_MANOVA <- aov(BC_Rot$Elbow_AROM ~ MEP_Group + Follow_Up
-                    + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+                    + MEP_Group*Follow_Up + Elbow_AROM_baseline, data = BC_Rot)
 summary(Elbow_MANOVA)
+
+holm_bonferroni(BC_Or$ROM_Elbow_Affected_Active_T3,
+                BC_Or$ROM_Elbow_Affected_Active_T2, 
+                BC_Or$ROM_Elbow_Affected_Active_T1)
+
+bootstrap_CI(BC_Or$ROM_Elbow_Affected_Active_T2, BC_Or$ROM_Elbow_Affected_Active_T3)
+bootstrap_CI(BC_Or$ROM_Elbow_Affected_Active_T1, BC_Or$ROM_Elbow_Affected_Active_T3)
+bootstrap_CI(BC_Or$ROM_Elbow_Affected_Active_T1, BC_Or$ROM_Elbow_Affected_Active_T2)
 ```
 $\\$
-No improvements were found in elbow AROM, as before.
-
 $\\$
 \textbf{Wrist Active ROM}
 ```{r}
 Wrist_MANOVA <- aov(BC_Rot$Wrist_AROM ~ MEP_Group + Follow_Up 
-                    + MEP_Group*Follow_Up + Participant, data = BC_Rot)
+                    + MEP_Group*Follow_Up + Wrist_AROM_Baseline, data = BC_Rot)
 summary(Wrist_MANOVA)
+
+holm_bonferroni(BC_Or$ROM_Wrist_Affected_Active_T3,
+                BC_Or$ROM_Wrist_Affected_Active_T2, 
+                BC_Or$ROM_Wrist_Affected_Active_T1)
+
+bootstrap_CI(BC_Or$ROM_Wrist_Affected_Active_T2, BC_Or$ROM_Wrist_Affected_Active_T3)
+bootstrap_CI(BC_Or$ROM_Wrist_Affected_Active_T1, BC_Or$ROM_Wrist_Affected_Active_T3)
+bootstrap_CI(BC_Or$ROM_Wrist_Affected_Active_T1, BC_Or$ROM_Wrist_Affected_Active_T2)
 ```
 $\\$
-No improvements were found in wrist AROM, as before.
-
 $\\$
-These are all of the results. 
